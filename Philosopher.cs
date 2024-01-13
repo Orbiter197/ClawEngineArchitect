@@ -2,13 +2,11 @@ using System;
 
 namespace ClawEngineArchitect
 {
-    public class Philosopher
+    public class Philosopher: TableObject
     {
-        public float Coordinate {get; private set;}
         public PhilosopherState State {get; private set;}
 
-        Philosopher(float coordinate) {
-            Coordinate = coordinate;
+        public Philosopher(float coordinate): base(coordinate) {
             State = PhilosopherState.Thinking;
         }
 

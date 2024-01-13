@@ -2,13 +2,11 @@ using System;
 
 namespace ClawEngineArchitect
 {
-    public class Fork
+    public class Fork: TableObject
     {
-        public float Coordinate {get; private set;}
         public ForkState State {get; set; }
 
-        Fork(float coordinate) {
-            Coordinate = coordinate;
+        public Fork(float coordinate): base(coordinate) {
             State = ForkState.Clear;
         }
     }
