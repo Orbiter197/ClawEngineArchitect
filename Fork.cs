@@ -9,6 +9,7 @@ namespace ClawEngineArchitect
 
         Fork(float coordinate) {
             Coordinate = coordinate;
+            State = ForkState.Clear;
         }
     }
 
