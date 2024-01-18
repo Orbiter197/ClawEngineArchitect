@@ -6,7 +6,9 @@ namespace ClawEngineArchitect // Note: actual namespace depends on the project n
     {
         static void Main(string[] args)
         {
-            Table table = new Table(5);
+            int forks = Convert.ToInt32(Console.ReadLine());
+            int philosophers = Convert.ToInt32(Console.ReadLine());
+            Table table = new Table(forks, philosophers);
             table.StartMeeting();
         }
     }
