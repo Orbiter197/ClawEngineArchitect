@@ -2,17 +2,25 @@ using System;
 
 namespace ClawEngineArchitect
 {
+    
     public class Philosopher: TableObject
     {
-        public PhilosopherState State {get; private set;}
+        private static int id = 0;
+        
+        public PhilosopherState State {get; set;}
 
-        public Philosopher(float coordinate): base(coordinate) {
+        public int Id {get; private set;}
+
+        public Philosopher() 
+        {
             State = PhilosopherState.Thinking;
+            Id = id++;
         }
 
-        public enum PhilosopherState {
-            Thinking,
-            Eating
-        }
+    }
+
+     public enum PhilosopherState {
+        Thinking,
+        Eating
     }
 }
