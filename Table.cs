@@ -1,4 +1,4 @@
-using System;
+using System.Data;
 
 namespace ClawEngineArchitect
 {
@@ -9,14 +9,17 @@ namespace ClawEngineArchitect
         /// </summary>
         private TableObject[] tableObjects; // order matters
 
+        private int Delay { get; set; }
+
         /// <summary>
         /// Creates a Table.
         /// Forks and Philosophers are osciliting in collection.
         /// </summary>
         /// <param name="forksCount">Number of forks.</param>
+        /// <param name="delay">Time for eating.</param>
         /// <exception cref="ArgumentException">If number of forks is less than 2,
         /// throws an exception</exception>
-        public Table(int forksCount)
+        public Table(int forksCount, int delay)
         {
             if (forksCount < 2)
             {
@@ -29,6 +32,8 @@ namespace ClawEngineArchitect
                 tableObjects[2 * i] = new Fork();
                 tableObjects[2 * i + 1] = new Philosopher();
             }
+
+            Delay = delay;
         }
 
         /// <summary>
@@ -37,9 +42,10 @@ namespace ClawEngineArchitect
         /// </summary>
         /// <param name="forksCount">Number of forks.</param>
         /// <param name="philosophersCount">Number of philosophers.</param>
+        /// <param name="delay">Time for eating.</param>
         /// <exception cref="ArgumentException">If number of forks is less than 2,
         /// throws an exception</exception>
-        public Table(int forksCount, int philosophersCount)
+        public Table(int forksCount, int philosophersCount, int delay)
         {
             if (forksCount < 2)
             {
@@ -66,14 +72,22 @@ namespace ClawEngineArchitect
                     forksCount--;
                 }
             }
+
+            Delay = delay;
         }
 
 
         /// <summary>
-        /// Starts the meeting.
+        /// Starts the meeting. Displays the result in console
         /// </summary>
-        public void StartMeeting()
+        /// <param name="interval">Interval in ms.</param>
+        /// <exception cref="ArgumentException"></exception>
+        public void StartMeeting(int interval)
         {
+            if (interval <= 0)
+            {
+                throw new ArgumentException("Interval must be positive");
+            }
             Console.WriteLine("Meeting started");
             for (int i = 0; i < tableObjects.Length; i++)
             {
@@ -85,6 +99,31 @@ namespace ClawEngineArchitect
                     thread.Start();
                 }
             }
+            
+
+            bool haveAllEaten;
+            do
+            {
+                Console.WriteLine(DateTime.Now);
+                haveAllEaten = true;
+                for (int i = 0; i < tableObjects.Length; i++)
+                {
+                    if (tableObjects[i] is Philosopher philosopher)
+                    {
+                        Console.WriteLine("Philosopher {0} is {1}. He has {2}eaten", philosopher.Id,
+                        philosopher.State == PhilosopherState.Eating ? "Eating" : "thinking",
+                        philosopher.HasEaten ? "" : "not ");
+
+                        haveAllEaten &= philosopher.HasEaten;
+                    }
+
+                }
+                Thread.Sleep(interval);
+            }
+            while (!haveAllEaten);
+
+            Console.WriteLine("Meeting ended");
+
         }
 
         /// <summary>
@@ -135,26 +174,18 @@ namespace ClawEngineArchitect
         /// <param name="rightFork">Right fork.</param>
         public void GrabForksOrThink(Philosopher philosopher, Fork leftFork, Fork rightFork)
         {
-            Console.WriteLine("Philosopher {0} is thinking", philosopher.Id);
-            philosopher.State = PhilosopherState.Thinking;
-
             lock (leftFork) lock (rightFork)
                 {
-                    Console.WriteLine("Philosopher {0} start eating, occuping Fork {1} and {2}",
-                    philosopher.Id, leftFork.Id, rightFork.Id);
 
                     philosopher.State = PhilosopherState.Eating;
                     leftFork.State = ForkState.Occuped;
                     rightFork.State = ForkState.Occuped;
 
-                    Thread.Sleep(10);
+                    Thread.Sleep(Delay);
 
                     philosopher.State = PhilosopherState.Thinking;
                     leftFork.State = ForkState.Clear;
                     rightFork.State = ForkState.Clear;
-
-                    Console.WriteLine("Philosopher {0} stops eating, clearing Fork {1} and {2}",
-                    philosopher.Id, leftFork.Id, rightFork.Id);
 
                 }
         }
